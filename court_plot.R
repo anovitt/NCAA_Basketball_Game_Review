@@ -1,7 +1,9 @@
-# plot NBA/NCAA basketball courts
+# plot NCAA basketball courts
 
 library(data.table)
 library(tidyverse)
+
+# funciton to get x , y coords of cirles
 
 circle_points = function(center = c(0, 0), radius = 1, npoints = 360) {
   angles = seq(0, 2 * pi, length.out = npoints)
@@ -11,6 +13,8 @@ circle_points = function(center = c(0, 0), radius = 1, npoints = 360) {
     y = center[2] + radius * sin(angles)
   )
 }
+
+# court dims 
 
 width = 50
 height = 94 / 2
@@ -27,6 +31,8 @@ three_point_side_radius = 22
 three_point_side_height = 14
 college_three_radius = 20.75
 college_three_radius_2020 = 21.65
+
+# data frame with court elements
 
 court_points = data_frame(
   x = c(width / 2, width / 2, -width / 2, -width / 2, width / 2),
@@ -113,9 +119,6 @@ court_points = bind_rows(
 ) %>%
   mutate(dash = (desc == "foul_circle_bottom"))
 
-nba_court_points = court_points %>%
-  filter(!(desc %in% c("college_three_line","college_three_line_2020", "college_key")))
-
 college_court_points = court_points %>%
   filter(!(desc %in% c("three_point_line", "foul_circle_bottom", "outer_key")))
 
@@ -139,15 +142,6 @@ theme_court = function(base_size = 12) {
       legend.text = element_text(size = rel(1.0))
     )
 }
-
-
-nba_court = ggplot() +
-  geom_path(data = nba_court_points,
-            aes(x = x, y = y - 5.25, group = desc, linetype = dash),
-            color = court_lines_color) +
-  scale_linetype_manual(values = c("solid", "longdash"), guide = FALSE) +
-  coord_fixed(ylim = c(-5.25, 32), xlim = c(-25, 25)) +
-  theme_court(base_size = 22)
 
 college_court = ggplot() +
   geom_path(data = college_court_points,
